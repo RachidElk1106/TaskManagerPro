@@ -9,21 +9,12 @@
   <body>
     <div class="app-shell">
       <header class="topbar">
-        <div class="brand-block" aria-label="Task Manager brand">
+        <div class="brand-block">
           <div class="brand-mark" aria-hidden="true">✓</div>
           <h1>Task Manager</h1>
         </div>
 
         <div class="topbar-actions">
-          <label class="sr-only" for="task-search">Search tasks</label>
-          <input
-            id="task-search"
-            type="search"
-            name="task-search"
-            placeholder="Search tasks"
-            aria-label="Search tasks"
-          />
-
           <button id="add-task-btn" class="btn btn-primary" type="button">
             Add Task
           </button>
@@ -31,28 +22,28 @@
       </header>
 
       <main class="dashboard">
-        <section class="stats" aria-label="Task statistics">
+        <section class="stats">
           <article class="stat-card" aria-label="Total tasks">
             <span class="stat-label">Total</span>
             <strong class="stat-value" id="stat-total">0</strong>
           </article>
 
-          <article class="stat-card" aria-label="To do tasks">
+          <article class="stat-card">
             <span class="stat-label">To Do</span>
             <strong class="stat-value" id="stat-todo">0</strong>
           </article>
 
-          <article class="stat-card" aria-label="In progress tasks">
+          <article class="stat-card">
             <span class="stat-label">In Progress</span>
             <strong class="stat-value" id="stat-in-progress">0</strong>
           </article>
 
-          <article class="stat-card" aria-label="In review tasks">
+          <article class="stat-card">
             <span class="stat-label">In Review</span>
             <strong class="stat-value" id="stat-in-review">0</strong>
           </article>
 
-          <article class="stat-card" aria-label="Done tasks">
+          <article class="stat-card">
             <span class="stat-label">Done</span>
             <strong class="stat-value" id="stat-done">0</strong>
           </article>
@@ -177,37 +168,12 @@
           </div>
 
           <div id="task-list" class="task-list" aria-live="polite">
-            <article id="div1" class="task-card" data-task-id="task-101" data-status="todo" data-priority="high">
-              <div class="task-card__header">
-                <div>
-                  <h3 class="task-title">Design homepage mockup</h3>
-                  <p class="task-description">
-                    Create a clean landing page with a marketing hero, feature blocks,
-                    and call-to-action sections.
-                  </p>
-                </div>
-
-                <div class="task-card__actions">
-                  <button type="button" class="btn btn-small btn-secondary" data-action="edit">
-                    Edit
-                  </button>
-                  <button type="button" class="btn btn-small btn-danger" data-action="delete">
-                    Delete
-                  </button>
-                </div>
-              </div>
-
-              <div class="task-card__meta">
-                <span class="status-badge status-todo">To Do</span>
-                <span class="priority-badge priority-high">High</span>
-                <time datetime="2026-08-25">Due Aug 25, 2026</time>
-              </div>
-            </article>
+            
           </div>
         </section>
       </main>
     </div>
-    
+    <script src="script.js"></script>
   </body>
-  <script src="script.js"></script>
+  
 </html>

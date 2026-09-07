@@ -408,6 +408,18 @@ textarea {
   border: 0;
 }
 
+.form-error {
+    display: block;
+    color: red;
+    margin-top: 4px;
+    font-size: 0.875rem;
+}
+
+.description-counter.is-invalid {
+    color: red;
+}
+
+
 @media (max-width: 900px) {
   .stats {
     grid-template-columns: repeat(2, minmax(160px, 1fr));

@@ -1,14 +1,13 @@
-//========================
-// 1. Initialize Variables
+// 1.States & Initialize Variables
+
 let tasks = []
+
 
 // Variable to keep track of the task being edited
 let editingTaskID = null;
 
 
-
-
-
+const maxDescriptionLength = 500;
 
 
 // ====================
@@ -19,26 +18,44 @@ let editingTaskID = null;
 const addTaskButton = document.getElementById('add-task-btn');
 
 // Get references to the task form and its input fields
-const taskformSection = document.getElementById('task-form-section');
+const taskFormSection = document.getElementById('task-form-section');
 const taskForm = document.getElementById('task-form');
 const taskFormTitle = document.getElementById('task-title');
 const taskFormDescription = document.getElementById('task-description');
 const taskFormStatus = document.getElementById('task-status');
 const taskFormPriority = document.getElementById('task-priority');
 const taskFormDueDate = document.getElementById('task-due-date');
+const cancelTaskBtn = document.getElementById('cancel-task-btn')
+
+// Create a small element for displaying title error messages
+const titleError = document.createElement('small');
+titleError.classList.add('form-error');
+
+taskFormTitle.after(titleError);
+
+// Create a small element for displaying description error messages
+const descriptionError = document.createElement('small');
+descriptionError.classList.add('form-error');
+taskFormDescription.after(descriptionError);
+// Create a small element for displaying description character count
+const descriptionCounter = document.createElement('small');
+descriptionCounter.classList.add('description-counter');
+descriptionCounter.textContent = `0/${maxDescriptionLength} characters`;
+taskFormDescription.after(descriptionCounter);
+
+// Create a small element for displaying due date error messages
+const dueDateError = document.createElement('small');
+dueDateError.classList.add('form-error');
+taskFormDueDate.after(dueDateError);
 
 // Get references to the filter and search elements
-
-const cancelTaskBtn = document.getElementById('cancel-task-btn')
 const searchInput = document.getElementById("search-input");
 const priorityFilter = document.getElementById("priority-filter");
 const filterStatus = document.getElementById("status-filter");
 const sortTasks = document.querySelector('#sort-tasks');
 
 // Get reference to the task list container
-const taskList = document.getElementById('task-list')
-
-
+const taskList = document.getElementById('task-list');
 
 
 // ====================
@@ -47,19 +64,13 @@ const taskList = document.getElementById('task-list')
 
 // Retrieve tasks from local storage if they exist
 const savedTasks = localStorage.getItem("tasks");
-
-
 if (savedTasks) {
     tasks = JSON.parse(savedTasks);
 }
-
-
+// Save tasks to local storage whenever they are updated
 function setTasksToLocalStorage() {
     localStorage.setItem("tasks", JSON.stringify(tasks));
 }
-
-
-
 
 // ====================
 // 4. Render
@@ -68,21 +79,69 @@ function renderTasks(tasksArray = tasks) {
     taskList.innerHTML = ''
     tasksArray.forEach(task => {
         
-        const newDiv = document.createElement("article");
-        newDiv.classList.add('task-card')
-        newDiv.setAttribute('data-task-id', task.id)
-        newDiv.setAttribute('data-status', task.status)
-        newDiv.setAttribute('data-priority', task.priority)
-        newDiv.innerHTML = `
-            <h2>${task.title}</h2>
-            <p>${task.description}</p>
-            <p>Status: ${task.status}</p>
-            <p>Due Date: ${task.dueDate}</p>
-            <p>Priority: ${task.priority}</p>
-            <button class="btn btn-primary edit-task-btn">Edit</button>
-            <button class="btn btn-danger delete-task-btn">Delete</button>
-        `
-        taskList.appendChild(newDiv)
+        const taskCard = document.createElement("article");
+        taskCard.classList.add('task-card')
+        taskCard.dataset.taskId = task.id;
+        taskCard.dataset.status = String(task.status);
+        taskCard.dataset.priority = String(task.priority);
+
+        const  taskCardHeader = document.createElement("div");
+        taskCardHeader.classList.add('task-card__header');
+        taskCard.appendChild(taskCardHeader);
+
+        const taskMeta = document.createElement("div");
+        taskMeta.classList.add('task-card__meta');
+        taskCard.appendChild(taskMeta);
+
+        const taskContent = document.createElement("div");
+        taskContent.classList.add('task-card__content');
+        taskCardHeader.appendChild(taskContent);
+
+        const taskActions = document.createElement("div");
+        taskActions.classList.add('task-card__actions');
+        taskCardHeader.appendChild(taskActions);
+
+        const taskTitle = document.createElement("h3")
+        taskTitle.textContent = task.title;
+        taskTitle.classList.add("task-title");
+        taskContent.appendChild(taskTitle);
+
+        const taskDescription = document.createElement("p")
+        taskDescription.textContent = task.description;
+        taskContent.appendChild(taskDescription);
+
+        const editButton = document.createElement("button")
+        editButton.textContent = "Edit"
+        editButton.classList.add('btn', 'btn-primary', 'edit-task-btn')
+        taskActions.appendChild(editButton)
+
+        const deleteButton = document.createElement("button")
+        deleteButton.textContent = "Delete"
+        deleteButton.classList.add('btn', 'btn-danger', 'delete-task-btn')
+        taskActions.appendChild(deleteButton)
+
+        const taskStatus = document.createElement("p")
+        taskStatus.textContent = task.status;
+        taskStatus.classList.add(
+            "status-badge",
+            `status-${task.status}`
+        );
+        taskMeta.appendChild(taskStatus);
+
+        const taskPriority = document.createElement("p")
+        taskPriority.textContent = task.priority;
+        taskPriority.classList.add(
+            "priority-badge",
+            `priority-${task.priority}`
+        );
+        taskMeta.appendChild(taskPriority);
+
+        const taskDueDate = document.createElement("time");
+        taskDueDate.textContent = task.dueDate;
+        taskDueDate.setAttribute("datetime", task.dueDate);
+        taskMeta.appendChild(taskDueDate);
+       
+        taskList.appendChild(taskCard)
     })
 }
 renderTasks(tasks);
@@ -94,16 +153,26 @@ renderTasks(tasks);
 
 taskList.addEventListener('click', (event) => {
     const taskCard = event.target.closest('.task-card')
-    
     if (!taskCard) return;
     
     const taskID = taskCard.dataset.taskId
 
+    //Edit Button
+   if(event.target.matches(".edit-task-btn")) {
+        errorEmpty();
+        taskFormSection.classList.remove('is-hidden')
+        taskFormTitle.focus();
+        const taskFind = tasks.find(task => task.id === taskID);
+        if (!taskFind) return;
+        editingTaskID = taskID;
+        taskFormTitle.value = taskFind.title;
+         taskFormDescription.value = taskFind.description;
+         taskFormDueDate.value = taskFind.dueDate;
+         taskFormPriority.value = taskFind.priority;
+         taskFormStatus.value = taskFind.status;
+   }
     //Delete Button
    if(event.target.matches(".delete-task-btn")) {
-        //const taskId = taskCard.getAttribute('data-task-id')
-        console.log(`Delete button clicked for task with ID: ${taskID}`)
-        //remove the task from the tasks array
         const taskIndex = tasks.findIndex(task => task.id === taskID)
         
         if (taskIndex !== -1) {
@@ -112,17 +181,7 @@ taskList.addEventListener('click', (event) => {
         }
         renderTasks()
    }
-   //Edit Button
-   if(event.target.matches(".edit-task-btn")) {
-        taskformSection.classList.remove('is-hidden')
-        const taskFind = tasks.find(task => task.id === taskID);
-        editingTaskID = taskID;
-        taskFormTitle.value = taskFind.title;
-         taskFormDescription.value = taskFind.description;
-         taskFormDueDate.value = taskFind.dueDate;
-         taskFormPriority.value = taskFind.priority;
-         taskFormStatus.value = taskFind.status;
-   }
+
 })
 
 
@@ -134,19 +193,23 @@ taskList.addEventListener('click', (event) => {
 // Add Task Button
 addTaskButton.addEventListener('click', () => {
     editingTaskID = null;
-    fieldsEmpty();
-    taskformSection.classList.remove('is-hidden')
+    errorEmpty();
+    resetTaskForm();
+    taskFormSection.classList.remove('is-hidden')
+    taskFormTitle.focus();
 })
 
 // Save Task
 taskForm.addEventListener('submit', (e) => {
     e.preventDefault()
+
+    if (!validateTaskForm()) {
+        return;
+    }    
+
     if(editingTaskID !== null) {
         const taskFind = tasks.find(task => task.id === editingTaskID);
-        if(taskFind === undefined) {
-            console.log(`Task with ID: ${editingTaskID} not found`)
-            return
-        }
+        if (!taskFind) return;
         taskFind.title = taskFormTitle.value;
         taskFind.description = taskFormDescription.value;
         taskFind.dueDate = taskFormDueDate.value;
@@ -170,23 +233,64 @@ taskForm.addEventListener('submit', (e) => {
 }
 
     renderTasks();
-    fieldsEmpty();
-    taskformSection.classList.add('is-hidden');
-    
+    resetTaskForm();
+    taskFormSection.classList.add('is-hidden');
 })
 
-function fieldsEmpty(){
+//Form Helpers
+function resetTaskForm(){
     taskFormTitle.value = "";
     taskFormDescription.value = "";
     taskFormDueDate.value = "";
-    taskFormPriority.value = "";
-    taskFormStatus.value = "";
+    taskFormPriority.value = "medium";
+    taskFormStatus.value = "todo";
+    descriptionCounter.textContent = `0/${maxDescriptionLength} characters`;
+    descriptionCounter.classList.remove('is-invalid');
+}
+
+function errorEmpty() {
+    titleError.textContent = "";
+    dueDateError.textContent = "";
+    descriptionError.textContent = "";
+}
+
+//Validation function for the task form
+
+function validateTaskForm() {
+    if(taskFormTitle.value.trim() === ""){
+        titleError.textContent = "Title is required.";
+        return false;
+    }
+  
+    const dueDateValue = taskFormDueDate.value;
+
+     if (dueDateValue === "") {
+        dueDateError.textContent = "Due date is required.";
+        return false;
+    }
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const dueDate = new Date(dueDateValue);
+    if (dueDate < today) {
+        dueDateError.textContent = "Due date cannot be in the past.";
+        return false;
+    }
+
+    const descriptionValue = taskFormDescription.value.trim();
+    if (descriptionValue.length > maxDescriptionLength) {
+        descriptionError.textContent = `Description cannot exceed ${maxDescriptionLength} characters.`;
+        return false;
+    }
+
+    return true;
 }
 
 // Cancel Task Button
 cancelTaskBtn.addEventListener('click', () => {
-    taskformSection.classList.add('is-hidden');
-    fieldsEmpty();
+    editingTaskID = null;
+    taskFormSection.classList.add('is-hidden');
+    resetTaskForm();
 })
 
 
@@ -200,7 +304,7 @@ function updateTasks() {
     const priorityValue = priorityFilter.value;
 
     // Filter tasks based on search, status, and priority
-    let filteredTasks = tasks.filter(task => {
+    const filteredTasks = tasks.filter(task => {
         const matchesSearch = 
             task.title.toLowerCase().includes(searchValue) ||
             task.description.toLowerCase().includes(searchValue);
@@ -288,4 +392,25 @@ priorityFilter.addEventListener('change', () => {
 //Sort Filter
 sortTasks.addEventListener("change", () => {
      updateTasks();
+});
+
+taskFormTitle.addEventListener('input', () => {
+    titleError.textContent = "";
+});
+
+taskFormDueDate.addEventListener('input', () => {
+    dueDateError.textContent = "";
+})
+
+taskFormDescription.addEventListener('input', () => {
+    descriptionError.textContent = "";
+    descriptionCounter.textContent =
+     `${taskFormDescription.value.length}/${maxDescriptionLength} characters`;
+
+
+    if(taskFormDescription.value.length > maxDescriptionLength) {
+        descriptionCounter.classList.add('is-invalid');
+    } else {
+        descriptionCounter.classList.remove('is-invalid');
+    }
 });
