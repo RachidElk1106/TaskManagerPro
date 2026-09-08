@@ -1,26 +1,34 @@
 # Task Manager Pro
 
-A simple task management web application built with **HTML, CSS, and JavaScript**.
+A task management web application built with **HTML, CSS, and JavaScript**.
 
-The project focuses on practicing JavaScript fundamentals through a real-world CRUD application.
+This project was built as a practical JavaScript learning project to understand how a real frontend application manages state, user interactions, CRUD operations, data persistence, filtering, sorting, validation, and DOM rendering.
 
 ---
 
 ## 📌 Project Status
 
-The application currently supports:
+The current version supports:
 
 * Create tasks
 * Read and display tasks
 * Update tasks
 * Delete tasks
 * Persist tasks using LocalStorage
-* Search tasks
+* Search tasks by title or description
 * Filter by status
 * Filter by priority
 * Sort tasks
-* Display an empty state when no tasks match the current filters
-* Organized JavaScript code into logical sections
+* Empty state when no tasks match the current criteria
+* Form validation
+* Due-date validation
+* Description character counter
+* Responsive layout
+* Dashboard task statistics
+* Event delegation
+* Dynamic DOM rendering
+* Basic XSS protection for user-generated task content
+* Organized JavaScript architecture
 
 ---
 
@@ -53,18 +61,19 @@ Each task contains:
 
 ### 💾 LocalStorage
 
-Tasks are stored in the browser using the **LocalStorage API**.
+Tasks are stored in the browser using the LocalStorage API.
 
 The application:
 
 1. Loads saved tasks when the page starts.
-2. Updates the `tasks` array when a task changes.
-3. Saves the updated data back to LocalStorage.
+2. Keeps the tasks in the application state.
+3. Updates the state when a task is created, edited, or deleted.
+4. Saves the updated tasks back to LocalStorage.
 
 Example:
 
 ```js
-function saveTasks() {
+function setTasksToLocalStorage() {
     localStorage.setItem("tasks", JSON.stringify(tasks));
 }
 ```
@@ -80,10 +89,10 @@ Tasks can be searched by:
 * Title
 * Description
 
-The search is performed while the user types.
+Search results are updated while the user types.
 
 ```js
-searchInput.addEventListener('input', () => {
+searchInput.addEventListener("input", () => {
     updateTasks();
 });
 ```
@@ -97,7 +106,7 @@ Tasks can be filtered by:
 * Status
 * Priority
 
-The filters can also work together with the search system.
+Search and filters can work together.
 
 For example:
 
@@ -107,7 +116,7 @@ Status: In Progress
 Priority: High
 ```
 
-The application displays only tasks matching all selected conditions.
+The application displays only tasks matching all active conditions.
 
 ---
 
@@ -123,7 +132,7 @@ Tasks can be sorted by:
 * Priority descending
 * Due date
 
-Sorting behavior is organized using **Object Mapping**.
+Sorting behavior is managed using an object mapping:
 
 ```js
 const sortFunctions = {
@@ -135,7 +144,7 @@ const sortFunctions = {
 };
 ```
 
-The selected sorting method is retrieved dynamically:
+The selected sorting function is retrieved dynamically:
 
 ```js
 const compareFunction = sortFunctions[sortTasks.value];
@@ -143,59 +152,150 @@ const compareFunction = sortFunctions[sortTasks.value];
 
 ---
 
+### 📝 Form Validation
+
+The task form includes validation for:
+
+* Required title
+* Required due date
+* Preventing past due dates
+* Maximum description length
+
+The description also includes a live character counter.
+
+The current maximum description length is:
+
+```text
+500 characters
+```
+
+---
+
 ### 📭 Empty State
 
-When no tasks match the current search or filters, the application displays:
+When no tasks match the current search, filters, or sorting criteria, the application displays:
 
 ```text
 No tasks found.
 ```
 
-This prevents the interface from appearing empty without explanation.
+This prevents the task area from appearing empty without explanation.
+
+---
+
+### 🔐 Security
+
+The project originally used `innerHTML` to render user-generated task content.
+
+This was replaced with DOM APIs such as:
+
+```js
+document.createElement()
+textContent
+appendChild()
+```
+
+This prevents user-entered task titles and descriptions from being interpreted as HTML.
+
+For example, malicious HTML entered as task content is treated as text instead of being executed.
+
+---
+
+### 📱 Responsive Design
+
+The interface is responsive and adapts to different screen sizes using CSS media queries.
+
+The layout changes for:
+
+* Desktop
+* Tablet
+* Mobile
+
+The task cards, controls, statistics, and form adapt to smaller screens.
 
 ---
 
 ## 🧠 JavaScript Concepts Practiced
 
-This project has been used to practice several important JavaScript concepts:
+This project was used to practice:
 
-* Variables and state
+### JavaScript Fundamentals
+
+* Variables
+* `let` and `const`
 * Objects
 * Arrays
-* Array methods
+* Functions
+* Arrow functions
+* Template literals
+* Conditional logic
+* Guard clauses
+
+### Array Methods
+
+* `forEach()`
 * `find()`
 * `findIndex()`
 * `filter()`
 * `sort()`
-* Functions
-* Arrow functions
-* DOM manipulation
+
+### DOM
+
+* `getElementById()`
+* `querySelector()`
 * `createElement()`
 * `appendChild()`
-* `innerHTML`
-* `addEventListener()`
-* Event delegation
+* `textContent`
+* `classList`
 * `dataset`
-* Template literals
-* LocalStorage
-* JSON
+* `closest()`
+
+### Events
+
+* `addEventListener()`
+* `input`
+* `change`
+* `submit`
+* `click`
+* Event delegation
+* `event.target`
+* `event.currentTarget`
+
+### Browser APIs
+
+* LocalStorage API
+* DOM API
 * `crypto.randomUUID()`
+
+### Data Handling
+
+* `JSON.stringify()`
+* `JSON.parse()`
 * Date objects
+
+### Application Concepts
+
+* Application state
+* CRUD operations
+* State-driven rendering
+* Filtering
+* Searching
+* Sorting
 * Object mapping
-* Guard clauses
-* CRUD logic
+* Form validation
+* Error handling in the UI
+* Separation between data processing and rendering
 
 ---
 
 ## 🏗️ Project Structure
 
 ```text
-Task-Manager/
+TaskManagerPro/
 │
 ├── index.html
 ├── style.css
 ├── script.js
-│
 └── README.md
 ```
 
@@ -203,7 +303,7 @@ Task-Manager/
 
 ## 🧩 JavaScript Architecture
 
-The JavaScript code is organized into the following sections:
+The JavaScript code is organized into logical sections:
 
 ```text
 1. State
@@ -217,113 +317,83 @@ The JavaScript code is organized into the following sections:
 9. Event Listeners
 ```
 
-This organization makes the code easier to read, debug, and extend.
+This structure makes the code easier to read, debug, and extend.
 
 ---
 
 ## 🔄 Application Flow
 
-The general flow of the application is:
+### General Flow
 
 ```text
 User Action
-     ↓
+    ↓
 Event Listener
-     ↓
+    ↓
 Update State
-     ↓
+    ↓
 Save to LocalStorage
-     ↓
+    ↓
 Render Tasks
-     ↓
+    ↓
 Updated UI
 ```
 
-For search and filtering:
+### Search / Filter / Sort Flow
 
 ```text
-User changes search/filter
-          ↓
-      updateTasks()
-          ↓
-      Filter tasks
-          ↓
-      Sort tasks
-          ↓
-      Render results
+User changes search/filter/sort
+            ↓
+       updateTasks()
+            ↓
+     Filter tasks
+            ↓
+      Sort results
+            ↓
+  renderTasks(filteredTasks)
+            ↓
+       Updated UI
 ```
 
 ---
 
-## 📊 Current CRUD Flow
+## 📊 State and Rendering
 
-### Create
+The application keeps the complete task collection in:
 
-```text
-Fill form
-   ↓
-Submit
-   ↓
-Create task object
-   ↓
-tasks.push()
-   ↓
-saveTasks()
-   ↓
+```js
+let tasks = [];
+```
+
+The original `tasks` array represents the application's source of truth.
+
+Search and filtering create a separate array:
+
+```js
+const filteredTasks = tasks.filter(...);
+```
+
+This allows the application to modify what is displayed without modifying the original task collection.
+
+The rendering responsibility is separated into:
+
+```js
 renderTasks()
 ```
 
-### Read
+while filtering, searching, and sorting are handled by:
 
-```text
-Load LocalStorage
-      ↓
-Parse JSON
-      ↓
-tasks array
-      ↓
-renderTasks()
-      ↓
-Display tasks
+```js
+updateTasks()
 ```
 
-### Update
-
-```text
-Click Edit
-   ↓
-Find task by ID
-   ↓
-Fill form
-   ↓
-Submit
-   ↓
-Update task
-   ↓
-saveTasks()
-   ↓
-renderTasks()
-```
-
-### Delete
-
-```text
-Click Delete
-   ↓
-Find task by ID
-   ↓
-Remove task
-   ↓
-saveTasks()
-   ↓
-renderTasks()
-```
+This separation keeps data processing independent from DOM rendering.
 
 ---
 
 ## 🆔 Task Identification
 
-Each task receives a unique ID using:
+Every task receives a unique ID:
 
 ```js
 id: crypto.randomUUID()
@@ -335,7 +405,13 @@ The ID is used to identify the correct task during:
 * Delete
 * DOM interaction
 
-Example:
+The task ID is also stored on the corresponding DOM element:
+
+```html
+data-task-id="..."
+```
+
+and accessed with:
 
 ```js
 const taskID = taskCard.dataset.taskId;
@@ -343,19 +419,23 @@ const taskID = taskCard.dataset.taskId;
 
 ---
 
-## 🔍 Filtering Logic
+## 🖱️ Event Delegation
 
-The application combines multiple conditions:
+Instead of adding separate click listeners to every dynamically created Edit and Delete button, the application uses event delegation:
 
-```text
-Search
-  AND
-Status
-  AND
-Priority
+```js
+taskList.addEventListener("click", (event) => {
+    // Handle task actions
+});
 ```
 
-A task is displayed only when it satisfies all active conditions.
+The application identifies the relevant task card using:
+
+```js
+event.target.closest(".task-card");
+```
+
+This approach works efficiently with dynamically generated task elements.
 
 ---
 
@@ -367,47 +447,61 @@ A task is displayed only when it satisfies all active conditions.
 * DOM API
 * LocalStorage API
 
-No frontend framework is currently used.
+No frontend framework is used in this version.
 
 ---
 
 ## 🎯 Learning Goals
 
-The main goal of this project is not only to build a task manager, but to understand how a real JavaScript application works.
+The main purpose of this project was not simply to build a task manager.
 
-The project is helping develop skills in:
+The goal was to understand how a real JavaScript frontend application works.
+
+Through this project, I practiced:
 
 * Managing application state
-* Manipulating the DOM
+* Creating and manipulating DOM elements
 * Handling user events
-* Working with browser storage
 * Building CRUD functionality
-* Filtering and sorting data
-* Organizing JavaScript code
-* Thinking about application flow
+* Persisting data in the browser
+* Searching and filtering data
+* Sorting data
+* Validating user input
+* Separating rendering from data processing
+* Using event delegation
+* Thinking about application architecture
+* Identifying and addressing basic security issues
+* Using Git and GitHub to manage the project
 
 ---
 
-## 🔮 Planned Improvements
+## 📈 Next Step
 
-Possible next improvements:
+The Vanilla JavaScript version of the project is now complete.
 
-* Form validation
-* Better status and priority UI
-* Delete confirmation
-* Improved empty states
-* Better date handling
-* Accessibility improvements
-* Security improvements
-* Dashboard statistics
-* More advanced state management
+The next stage of the learning journey is to rebuild the Task Manager using **React**.
+
+The React version will be used to understand:
+
+* Components
+* JSX
+* Props
+* State
+* Event handling
+* Rendering lists
+* Forms
+* `useState`
+* `useEffect`
+* Component-based architecture
+
+The goal is not simply to rewrite the same application, but to understand **what React solves and why component-based UI architecture is useful**.
 
 ---
 
 ## 👨‍💻 Project Purpose
 
-This project is part of a practical JavaScript learning journey.
+This project is part of a practical web development learning journey.
 
-Instead of learning JavaScript only through isolated exercises, concepts are introduced and applied directly inside a real project.
+Instead of learning JavaScript only through isolated exercises, concepts were introduced and applied directly inside a real application.
 
-**Current focus:** strengthening JavaScript fundamentals through practical development.
+The project represents the transition from learning individual JavaScript concepts to building a structured frontend application.
