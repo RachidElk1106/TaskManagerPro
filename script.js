@@ -58,6 +58,13 @@ const sortTasks = document.querySelector('#sort-tasks');
 const taskList = document.getElementById('task-list');
 
 
+//Dashboard References
+const statTotal = document.getElementById("stat-total");
+const statTodo = document.getElementById("stat-todo");
+const statInProgress = document.getElementById("stat-in-progress");
+const statInReview = document.getElementById("stat-in-review");
+const statDone = document.getElementById("stat-done");
+
 // ====================
 // 3. LocalStorage
 // ====================
@@ -77,6 +84,11 @@ function setTasksToLocalStorage() {
 // ====================
 function renderTasks(tasksArray = tasks) {
     taskList.innerHTML = ''
+    if (tasksArray.length === 0) {
+    taskList.innerHTML = '<p>No tasks found</p>';
+    updateStats();
+    return;
+}
     tasksArray.forEach(task => {
         
         const taskCard = document.createElement("article");
@@ -142,7 +154,9 @@ function renderTasks(tasksArray = tasks) {
         taskMeta.appendChild(taskDueDate);
        
         taskList.appendChild(taskCard)
-    })
+    });
+
+    updateStats();
 }
 renderTasks(tasks);
 
@@ -294,6 +308,27 @@ cancelTaskBtn.addEventListener('click', () => {
 })
 
 
+
+//======================
+// . Dashboard
+//======================
+
+function updateStats() {
+    statTotal.textContent = tasks.length;
+
+    statTodo.textContent =
+        tasks.filter(task => task.status === "todo").length;
+
+    statInProgress.textContent =
+        tasks.filter(task => task.status === "in-progress").length;
+
+    statInReview.textContent =
+        tasks.filter(task => task.status === "in-review").length;
+
+    statDone.textContent =
+        tasks.filter(task => task.status === "done").length;
+}
+
 // ====================
 // 7. Filtering & Search
 // ====================
@@ -328,10 +363,7 @@ function updateTasks() {
         filteredTasks.sort(compareFunction);
     }
 
-    if(filteredTasks.length === 0) {
-        taskList.innerHTML = '<p>No tasks found.</p>';
-        return;
-    }
+   
     renderTasks(filteredTasks);
 }
 
